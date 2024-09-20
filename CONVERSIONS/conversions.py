@@ -20,11 +20,12 @@ while True:
             count += 1
             if count > 7:
                 count = 0
-        tempCount = count
+
         print("CURRENT COUNT", count)
         for i in range(len(LEDs)):
-             LEDs[i].value(tempCount % 2)
-             tempCount = math.floor(tempCount / 2)
+             LEDs[i].value(count & 2 ** i)
+             # I first tried using count << i & 4, but this lead to mirrored LEDs lighting
+
 
             
 
