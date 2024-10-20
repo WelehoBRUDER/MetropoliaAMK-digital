@@ -72,11 +72,42 @@ class Alarm_system:
         self.state = self.check_alarm
         
     def check_alarm(self):
-        pass
+        print("LAMP", self.lamp.value())
+        if not self.alarm.value():
+            if not self.lamp.value():
+                self.state = self.activate
+            else:
+                self.state = self.blink
+        else:
+            if self.siren.value():  
+               self.state = self.lamp_on
+            else:
+                self.state = self.reset
+        time.sleep_ms(self.delay)
         
     def activate(self):
         self.lamp.on()
         self.siren.on()
+        time.sleep_ms(self.delay)
+        print(self.button.value())
+        if not self.button.value():
+            self.state = self.blink
+        else:
+            self.state = self.check_alarm
+            
+    def lamp_on(self):
+        self.siren.off()
+        self.lamp.on()
+        time.sleep_ms(self.delay)
+        self.state = self.check_alarm
+            
+    def blink(self):
+        self.siren.off()
+        self.lamp.on()
+        time.sleep_ms(int(self.delay / 2))
+        self.lamp.off()
+        time.sleep_ms(int(self.delay / 2))
+        self.state = self.blink
         
 ALARM_SYSTEM = Alarm_system(7, 9, 22, 20, 100)
 
@@ -87,4 +118,5 @@ def Start_alarm_system():
 # Did this to keep both in the same file.
 Start_light_asm()
 # Start_alarm_system()
+# Alarm system is not finished because I couldn't figure it out.
 
