@@ -12,7 +12,7 @@ class Ufo_controller:
         self.height = height
         self.left = Pin(left_pin, mode=Pin.IN, pull=Pin.PULL_UP)
         self.right = Pin(right_pin, mode=Pin.IN, pull=Pin.PULL_UP)
-        self.x = 0 # initial x
+        self.x = self.center() # initial x
         self.y = screen_height - 8  # the lowest point this sprite can be displayed at
     
     def render(self):
@@ -21,23 +21,27 @@ class Ufo_controller:
         screen.text(sprite, self.x, self.y, 1)
         screen.show()
         
+    def center(self):
+        return int((screen_width - self.width * self.height) / 2)
+        
     def max_x(self):
-        return screen_width - self.width * 8
+        return screen_width - self.width * self.height # How far right the UFO can go
     
     def move(self, cord):
-        if self.x + cord + self.width > self.max_x():
+        # This could fit in one if statement, but it is split in two for clarity.
+        if self.x + cord + self.width > self.max_x(): # return if UFO is trying to go TOO far right
             return
-        elif self.x + cord < 0:
+        elif self.x + cord < 0: # also return if UFO is trying to TOO far left
             return
         self.x += cord
-        self.render()
+        self.render() # refresh the screen
     
     def playing(self):
         self.render()
         while True:
-            if(self.left.value() == 0):
+            if(self.left.value() == 0): # Go left
                 self.move(-1)
-            elif (self.right.value() == 0):
+            elif (self.right.value() == 0): # Go right
                 self.move(1)
             
             
