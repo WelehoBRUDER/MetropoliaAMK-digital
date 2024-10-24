@@ -41,7 +41,7 @@ class Ufo_controller:
             
         
 # min width is 2, which results in <> as the sprite.
-# 9 and 7 are the control pins, SW_2 is right and SW_0 is left.
-UFO = Ufo_controller(3, 9, 7) 
-UFO.move(50) # just roughly centers the UFO at the start
+# width higher than 8 is not recommended.
+# 9 and 7 are the control pins, SW_2 is left and SW_0 is right.
+UFO = Ufo_controller(3, 7, 9) 
 UFO.playing() # starts game loop
