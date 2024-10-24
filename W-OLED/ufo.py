@@ -7,12 +7,13 @@ screen_height = 64
 screen = SSD1306_I2C(screen_width, screen_height, i2c)
 
 class Ufo_controller:
-    def __init__(self, width, left_pin, right_pin):
+    def __init__(self, width, left_pin, right_pin, height = 8):
         self.width = width
+        self.height = height
         self.left = Pin(left_pin, mode=Pin.IN, pull=Pin.PULL_UP)
         self.right = Pin(right_pin, mode=Pin.IN, pull=Pin.PULL_UP)
         self.x = 0 # initial x
-        self.y = 56 # the lowest point this sprite can be displayed at
+        self.y = screen_height - 8  # the lowest point this sprite can be displayed at
     
     def render(self):
         screen.fill(0)
@@ -32,6 +33,7 @@ class Ufo_controller:
         self.render()
     
     def playing(self):
+        self.render()
         while True:
             if(self.left.value() == 0):
                 self.move(-1)
