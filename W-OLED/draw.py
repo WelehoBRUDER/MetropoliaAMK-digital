@@ -24,12 +24,12 @@ class Draw_controller:
         screen.pixel(self.x, self.y, 1)
         screen.show()
         
-    # This function resets the x and y position, and optionally clears the screen.
+    # This function resets the x position, and optionally clears the screen and resets y.
     def draw_reset(self, clear = True):
         if clear:
             screen.fill(0)
+            self.y = center
         self.x = 0
-        self.y = center
         screen.show()
     
     def draw_loop(self):
