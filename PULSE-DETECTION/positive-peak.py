@@ -14,7 +14,7 @@ last_slope = 0
 
 iterator = 0
 
-while len(peaks) < 3:
+while len(peaks) < 4:
     curr_sample = data.get()
     slope = curr_sample - last_sample
     if curr_sample > prev_max:
@@ -39,9 +39,11 @@ for i in range(1, len(peaks)):
     average_time += times[i - 1]
     
 average_time = average_time / len(times)
+peaks_display = peaks
+peaks_display.pop(0)
         
 
-print("Peaks", peaks)
+print("Peaks", peaks_display)
 print("Intervals (s)", times)
 print("Frequency (Hz)", 1 / average_time)
         
