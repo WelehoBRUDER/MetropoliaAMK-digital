@@ -39,6 +39,7 @@ class LED_Menu:
         self.click.irq(handler = self.handler, trigger = Pin.IRQ_RISING, hard = True)
         self.select = 0
         self.prev_tick = 0
+        self.fifo = Fifo(10, typecode = "i")
         self.leds = [Pin(22, Pin.OUT), Pin(21, Pin.OUT), Pin(20, Pin.OUT)]
     
     def scroll(self, amnt):
@@ -67,6 +68,14 @@ class LED_Menu:
             screen.text(text, 0, i * 12, 1)
         screen.show()
         
+    def update_leds(self, data):
+        if data > 0:
+            # Toggle LEDs
+            if(self.leds[self.select].value()):
+                self.leds[self.select].off()
+            else:
+                self.leds[self.select].on()
+        
     
     def handler(self, pin):
         # Get current time ticks in ms
@@ -74,11 +83,11 @@ class LED_Menu:
         # Compare to previous stamp, if time between is below 50ms, return.
         if tick - self.prev_tick < 50:
             return
-        # Toggle LEDs
-        if(self.leds[self.select].value()):
-            self.leds[self.select].off()
+        if not self.click():
+            self.fifo.put(1)
         else:
-            self.leds[self.select].on()
+            self.fifo.put(0)
+
         # Update previous stamp
         self.prev_tick = tick
         
@@ -89,9 +98,10 @@ menu = LED_Menu(12)
         
 # main loop
 while True:
+    while menu.fifo.has_data():
+        menu.update_leds(menu.fifo.get())
     while rot.fifo.has_data():
         menu.scroll(rot.fifo.get())
-        
     
     menu.update()
 
