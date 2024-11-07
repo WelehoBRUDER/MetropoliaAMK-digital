@@ -25,6 +25,11 @@ class Encoder:
         self.a.irq(handler = self.handler, trigger = Pin.IRQ_RISING, hard = True)
         
     def handler(self, pin):
+        # Get current time ticks in ms
+        tick = time.ticks_ms()
+        # Disable menu for 100ms when clicking to prevent jankiness
+        if tick - menu.prev_tick < 100:
+            return
         if self.b():
             self.fifo.put(-1)
         else:
@@ -63,9 +68,10 @@ class LED_Menu:
             if i == self.select:
                 text = f"[{text}]"
                 # Draws a horizontal line below the text (looks fancy)
-                screen.hline(0, i * 12 + 8, len(text) * 8, 1)
+                screen.hline(0, i * 12 + 8, len(text) * 8 + 12, 1)
             # Print text, leaving a 4px vertical margin between each one.
-            screen.text(text, 0, i * 12, 1)
+            screen.text(text, 12, i * 12, 1)
+            screen.blit(bulb, 0, i * 12)
         screen.show()
         
     def update_leds(self, data):
@@ -83,10 +89,8 @@ class LED_Menu:
         # Compare to previous stamp, if time between is below 50ms, return.
         if tick - self.prev_tick < 50:
             return
-        if not self.click():
-            self.fifo.put(1)
-        else:
-            self.fifo.put(0)
+        # Update click to fifo when value is 0 (grounding)
+        self.fifo.put(1)
 
         # Update previous stamp
         self.prev_tick = tick
@@ -98,10 +102,13 @@ menu = LED_Menu(12)
         
 # main loop
 while True:
+    # Go through clicks
     while menu.fifo.has_data():
         menu.update_leds(menu.fifo.get())
+    # Go through rotations
     while rot.fifo.has_data():
         menu.scroll(rot.fifo.get())
     
+    # Update menu screen
     menu.update()
 
