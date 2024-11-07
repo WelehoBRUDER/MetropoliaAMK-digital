@@ -3,10 +3,15 @@ from fifo import Fifo
 import time
 from filefifo import Filefifo
 from ssd1306 import SSD1306_I2C
+
+# Read the file
 file = Filefifo(10, name = 'capture_250Hz_01.txt')
+# Set how many values should be read from the file
 values = 1000
+# Init min and max values
 min_val = file.get()
 max_val = file.get()
+# Create empty data list
 data = []
 
 # Set OLED width and height in pixels
@@ -17,6 +22,7 @@ screen_height = 64
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 screen = SSD1306_I2C(screen_width, screen_height, i2c)
 
+# Read values and insert to data while finding min and max
 for _ in range(values):
     value = file.get()
     if value > max_val:
