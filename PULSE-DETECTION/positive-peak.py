@@ -20,7 +20,7 @@ while len(peaks) < 4:
     if curr_sample > prev_max:
         prev_max = curr_sample
         curr_peak = iterator
-    if slope < 0 and last_slope >= 0:
+    if slope <= 0 and last_slope > 0:
         peaks.append(curr_peak)
         prev_max = 0
         
@@ -33,17 +33,15 @@ while len(peaks) < 4:
         
 times = []
 average_time = 0
-for i in range(1, len(peaks)):
-    times.append((1 / 250) * (peaks[i] - peaks[i - 1]))
+for i in range(len(peaks) - 1):
+    times.append((1 / 250) * (peaks[i + 1] - peaks[i]))
         
-    average_time += times[i - 1]
+    average_time += times[i]
     
 average_time = average_time / len(times)
-peaks_display = peaks
-peaks_display.pop(0)
         
 
-print("Peaks", peaks_display)
+print("Peaks", peaks)
 print("Intervals (s)", times)
 print("Frequency (Hz)", 1 / average_time)
         
