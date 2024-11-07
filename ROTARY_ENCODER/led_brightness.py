@@ -45,8 +45,8 @@ class Encoder:
                 self.prev_click = tick
             
     def change_brightness(self, value):
-        # Brightness increment is multiplied by 217 because the total value is massive
-        self.brightness += value * 217
+        # Brightness increment is multiplied by 650 because the total value is massive
+        self.brightness += value * 650
         # Check if brightness is outside of limits
         # and reset it if it is.
         if self.brightness > self.brightness_limit:
