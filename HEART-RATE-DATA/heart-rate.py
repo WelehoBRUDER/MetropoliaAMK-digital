@@ -2,7 +2,6 @@ from machine import Pin, I2C
 from fifo import Fifo
 import time
 from filefifo import Filefifo
-from ssd1306 import SSD1306_I2C
 
 # Read the file
 file = Filefifo(10, name = 'capture02_250Hz.txt')
@@ -19,13 +18,13 @@ for _ in range(samples):
     values.append(val)
     
 threshold = int((max(values) + min(values)) / 2)
-print(threshold)
 
 prev_signal = 0
 prev_max = 0
 prev_slope = 0
 peak = 0
 i = 0
+was_below = True
 while len(peaks) < 20:
     signal = file.get()
     slope = signal - prev_signal
@@ -33,10 +32,13 @@ while len(peaks) < 20:
         peak = i
         prev_max = signal
     if signal > threshold and slope <= 0 and prev_slope > 0:
-        peaks.append(peak)
-        prev_max = 0
+        if was_below:
+            peaks.append(peak)
+            prev_max = 0
+            was_below = False
     if signal <= threshold:
         prev_max = 0
+        was_below = True
     prev_signal = signal
     prev_slope = slope
     i += 1
@@ -44,7 +46,6 @@ while len(peaks) < 20:
         
 hr = []
 average_time = 0
-print(peaks)
 for i in range(len(peaks) - 1):
     time = ((1 / 250) * (peaks[i + 1] - peaks[i]))
     hr.append(int(60 / time))
