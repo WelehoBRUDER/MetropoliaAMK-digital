@@ -14,7 +14,7 @@ class HeartMaster:
         self.signal = 0
         self.thresh = 0
         self.peaks = []
-        self.count = 1
+        self.count = 0
         self.dipped = True
         
     def set_thresh(self):
@@ -55,14 +55,12 @@ class HeartMaster:
             hr.append(int(60 / time))
             
         heart_rates = []
+        median = hr[int(len(hr) / 2)]
                  
         for i in range(len(hr)):
             time = hr[i]
-            if i > 0:
-                if not time > hr[i - 1] * 1.5 and not time < hr[i - 1] * 0.5 and not time > 240 and not time < 40:
-                     heart_rates.append(time)
-            else:
-                 heart_rates.append(time)
+            if not time > median * 1.35 and not time < median * 0.65:
+                heart_rates.append(time)
                  
         return heart_rates
         
