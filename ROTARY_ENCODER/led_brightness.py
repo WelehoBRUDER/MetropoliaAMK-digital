@@ -1,6 +1,7 @@
 from machine import Pin, PWM
 from fifo import Fifo
 import time
+from led import Led
 
 class Encoder:
     def __init__(self, rot_a, rot_b, rot_c):
