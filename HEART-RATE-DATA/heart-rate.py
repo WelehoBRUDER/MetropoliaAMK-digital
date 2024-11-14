@@ -4,7 +4,7 @@ import time
 from filefifo import Filefifo
 
 # Read the file
-file = Filefifo(10, name = 'capture01_250Hz.txt')
+file = Filefifo(10, name = 'capture02_250Hz.txt')
 
 class HeartMaster:
     def __init__(self):
@@ -28,7 +28,7 @@ class HeartMaster:
         self.max = 0
         
     def measure(self):
-        if(self.count % 250 == 0):
+        if(self.count % 750 == 0):
             self.calc_thresh()
             self.prev_max = 0
             
@@ -56,13 +56,15 @@ class HeartMaster:
             
         heart_rates = []
         median = hr[int(len(hr) / 2)]
-        
-        half_window = 3
-        
+            
         for i in range(len(hr)):
             # median boundaries
-            start = max(0, i - half_window)
-            end = min(len(hr), i + half_window + 1)
+            size = 17
+            start = i
+            end = min(len(hr), i + size)
+            if end < i + size:
+                diff = i + size - end
+                start = i - diff
             
             # segment
             window = hr[start:end]
@@ -70,17 +72,18 @@ class HeartMaster:
             # median
             sorted_window = sorted(window)
             window_size = len(sorted_window)
+        
             
             if window_size % 2 == 1:
-                heart_rates.append(sorted_window[window_size // 2])
+                heart_rates.append(int(sorted_window[window_size // 2]))
             else:
-                heart_rates.append(sorted_window[window_size // 2 - 1] + sorted_window[window_size // 2] / 2)
+                heart_rates.append(int(sorted_window[window_size // 2 - 1] + sorted_window[window_size // 2] / 2))
                  
         return heart_rates
         
 heart_master = HeartMaster()
 
-while len(heart_master.peaks) < 50:
+while len(heart_master.peaks) < 40:
     heart_master.signal = file.get()
     heart_master.measure()
     
