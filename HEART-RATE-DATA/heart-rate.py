@@ -4,7 +4,7 @@ import time
 from filefifo import Filefifo
 
 # Read the file
-file = Filefifo(10, name = 'capture03_250Hz.txt')
+file = Filefifo(10, name = 'capture02_250Hz.txt')
 
 class HeartMaster:
     def __init__(self):
@@ -24,7 +24,7 @@ class HeartMaster:
             self.min = self.signal
         
     def calc_thresh(self):
-        self.thresh = int((self.max + self.min) / 2)
+        self.thresh = int((self.max - self.min) * 0.8 + self.min)
         self.max = 0
         
     def measure(self):
@@ -34,7 +34,7 @@ class HeartMaster:
             
         self.set_thresh()
             
-        #print("signal:",signal, "threshold:",threshold)
+        #print("signal:",self.signal, "threshold:",self.thresh)
         if self.signal > self.thresh:
             self.peak = self.count
             
