@@ -4,7 +4,7 @@ import time
 from filefifo import Filefifo
 
 # Read the file
-file = Filefifo(10, name = 'capture02_250Hz.txt')
+file = Filefifo(10, name = 'capture01_250Hz.txt')
 
 class HeartMaster:
     def __init__(self):
@@ -56,17 +56,31 @@ class HeartMaster:
             
         heart_rates = []
         median = hr[int(len(hr) / 2)]
-                 
+        
+        half_window = 3
+        
         for i in range(len(hr)):
-            time = hr[i]
-            if not time > median * 1.35 and not time < median * 0.65:
-                heart_rates.append(time)
+            # median boundaries
+            start = max(0, i - half_window)
+            end = min(len(hr), i + half_window + 1)
+            
+            # segment
+            window = hr[start:end]
+            
+            # median
+            sorted_window = sorted(window)
+            window_size = len(sorted_window)
+            
+            if window_size % 2 == 1:
+                heart_rates.append(sorted_window[window_size // 2])
+            else:
+                heart_rates.append(sorted_window[window_size // 2 - 1] + sorted_window[window_size // 2] / 2)
                  
         return heart_rates
         
 heart_master = HeartMaster()
 
-while len(heart_master.peaks) < 40:
+while len(heart_master.peaks) < 50:
     heart_master.signal = file.get()
     heart_master.measure()
     
