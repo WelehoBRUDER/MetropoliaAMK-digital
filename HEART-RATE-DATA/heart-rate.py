@@ -4,7 +4,7 @@ import time
 from filefifo import Filefifo
 
 # Read the file
-file = Filefifo(10, name = 'capture02_250Hz.txt')
+file = Filefifo(10, name = 'capture01_250Hz.txt')
 
 class HeartMaster:
     def __init__(self):
@@ -28,7 +28,7 @@ class HeartMaster:
         self.max = 0
         
     def measure(self):
-        if(self.count % 750 == 0):
+        if(self.count % 500 == 0):
             self.calc_thresh()
             self.prev_max = 0
             
@@ -52,6 +52,7 @@ class HeartMaster:
         average_time = 0
         for i in range(len(self.peaks) - 1):
             time = ((1 / 250) * (self.peaks[i + 1] - self.peaks[i]))
+            print(time)
             hr.append(int(60 / time))
             
         heart_rates = []
@@ -59,7 +60,7 @@ class HeartMaster:
             
         for i in range(len(hr)):
             # median boundaries
-            size = 17
+            size = 7
             start = i
             end = min(len(hr), i + size)
             if end < i + size:
@@ -83,7 +84,7 @@ class HeartMaster:
         
 heart_master = HeartMaster()
 
-while len(heart_master.peaks) < 40:
+while len(heart_master.peaks) < 20:
     heart_master.signal = file.get()
     heart_master.measure()
     
