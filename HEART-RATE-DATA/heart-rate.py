@@ -15,6 +15,8 @@ class HeartMaster:
         self.thresh = 0
         self.peaks = []
         self.count = 0
+        self.loops = 0
+        self.delay_by_loops = 2
         self.dipped = True
         
     def set_thresh(self):
@@ -30,6 +32,7 @@ class HeartMaster:
     def measure(self):
         if(self.count % 500 == 0):
             self.calc_thresh()
+            self.loops += 1
             self.prev_max = 0
             
         self.set_thresh()
@@ -39,7 +42,7 @@ class HeartMaster:
             self.peak = self.count
             
         if self.signal > self.thresh:
-            if self.dipped:
+            if self.dipped and self.loops > self.delay_by_loops:
                 self.peaks.append(self.peak)
                 self.dipped = False
         if self.signal <= self.thresh:
@@ -52,7 +55,6 @@ class HeartMaster:
         average_time = 0
         for i in range(len(self.peaks) - 1):
             time = ((1 / 250) * (self.peaks[i + 1] - self.peaks[i]))
-            print(time)
             hr.append(int(60 / time))
             
         heart_rates = []
@@ -60,7 +62,7 @@ class HeartMaster:
             
         for i in range(len(hr)):
             # median boundaries
-            size = 7
+            size = 9
             start = i
             end = min(len(hr), i + size)
             if end < i + size:
@@ -75,16 +77,13 @@ class HeartMaster:
             window_size = len(sorted_window)
         
             
-            if window_size % 2 == 1:
-                heart_rates.append(int(sorted_window[window_size // 2]))
-            else:
-                heart_rates.append(int(sorted_window[window_size // 2 - 1] + sorted_window[window_size // 2] / 2))
+            heart_rates.append(int(sorted_window[window_size // 2]))
                  
         return heart_rates
         
 heart_master = HeartMaster()
 
-while len(heart_master.peaks) < 20:
+while len(heart_master.peaks) < 30 + heart_master.delay_by_loops:
     heart_master.signal = file.get()
     heart_master.measure()
     
