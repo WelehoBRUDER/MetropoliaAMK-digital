@@ -16,7 +16,7 @@ class HeartMaster:
         self.peaks = []
         self.count = 0
         self.loops = 0
-        self.delay_by_loops = 2
+        self.delay_by_loops = 16
         self.dipped = True
         
     def set_thresh(self):
@@ -42,8 +42,9 @@ class HeartMaster:
             self.peak = self.count
             
         if self.signal > self.thresh:
-            if self.dipped and self.loops > self.delay_by_loops:
-                self.peaks.append(self.peak)
+            if self.dipped:
+                if self.loops > self.delay_by_loops:
+                    self.peaks.append(self.peak)
                 self.dipped = False
         if self.signal <= self.thresh:
             self.dipped = True
@@ -53,7 +54,7 @@ class HeartMaster:
     def get_heart_rates(self):
         hr = []
         average_time = 0
-        for i in range(len(self.peaks) - 1):
+        for i in range(0, len(self.peaks) - 1):
             time = ((1 / 250) * (self.peaks[i + 1] - self.peaks[i]))
             hr.append(int(60 / time))
             
@@ -62,7 +63,7 @@ class HeartMaster:
             
         for i in range(len(hr)):
             # median boundaries
-            size = 9
+            size = 7
             start = i
             end = min(len(hr), i + size)
             if end < i + size:
