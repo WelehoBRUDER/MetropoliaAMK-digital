@@ -18,7 +18,7 @@ class HeartMaster:
         self.loops = 0
         self.fifo = Fifo(30, typecode = "i")
         self.dipped = True
-        self.ppg = ADC(Pin(27))
+        self.ppg = ADC(Pin(26))
         self.tmr = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=self.adc_callback)
         
     def adc_callback(self, ms):
@@ -32,11 +32,11 @@ class HeartMaster:
             self.min = self.signal
         
     def calc_thresh(self):
-        self.thresh = int((self.max - self.min) * 0.8 + self.min)
+        self.thresh = int((self.max - self.min) * 0.9 + self.min)
         self.max = 0
         
     def measure(self):
-        if(self.count % 1000 == 0):
+        if(self.count % 250 == 0):
             self.calc_thresh()
             self.loops += 1
             self.prev_max = 0
@@ -68,7 +68,7 @@ class HeartMaster:
             
         for i in range(len(hr)):
             # median boundaries
-            size = 7
+            size = 5
             start = i
             end = min(len(hr), i + size)
             if end < i + size:
@@ -85,7 +85,7 @@ class HeartMaster:
             
             heart_rates.append(int(sorted_window[window_size // 2]))
                  
-        return heart_rates
+        return heart_rates[0]
         
 heart_master = HeartMaster()
 
@@ -93,9 +93,10 @@ while True:
     while heart_master.fifo.has_data():
         heart_master.signal = heart_master.fifo.get()
         heart_master.measure()
+        #print("thresh", heart_master.thresh, "signal", heart_master.signal)
         
-    if len(heart_master.peaks) > 1:
-        time = ((1 / 250) * (heart_master.peaks[1] - heart_master.peaks[0]))
-        print(int(60 / time))
+    if len(heart_master.peaks) > 4:
+        heart_rates = heart_master.get_heart_rates()
+        print("BPM", heart_rates)
         heart_master.peaks = []
 
