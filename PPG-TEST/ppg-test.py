@@ -85,6 +85,9 @@ class HeartMaster:
             
             heart_rates.append(int(sorted_window[window_size // 2]))
                  
+        heart_rate = heart_rates[0]
+        if heart_rate > 240 or heart_rate < 40:
+            return 0
         return heart_rates[0]
         
 heart_master = HeartMaster()
@@ -96,7 +99,10 @@ while True:
         #print("thresh", heart_master.thresh, "signal", heart_master.signal)
         
     if len(heart_master.peaks) > 4:
-        heart_rates = heart_master.get_heart_rates()
-        print("BPM", heart_rates)
+        heart_rate = heart_master.get_heart_rates()
+        if heart_rate == 0:
+            print("EXCESSIVE NOISE")
+        else:
+            print("BPM", heart_rate)
         heart_master.peaks = []
 
